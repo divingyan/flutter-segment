@@ -4,6 +4,7 @@
 #import <Analytics/SEGMiddleware.h>
 #import <Segment_Amplitude/SEGAmplitudeIntegrationFactory.h>
 
+
 @implementation FlutterSegmentPlugin
 // Contents to be appended to the context
 static NSDictionary *_appendToContextMiddleware;
@@ -16,7 +17,7 @@ static NSDictionary *_appendToContextMiddleware;
     BOOL trackApplicationLifecycleEvents = [[dict objectForKey: @"com.claimsforce.segment.TRACK_APPLICATION_LIFECYCLE_EVENTS"] boolValue];
     BOOL isAmplitudeIntegrationEnabled = [[dict objectForKey: @"com.claimsforce.segment.ENABLE_AMPLITUDE_INTEGRATION"] boolValue];
     SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:writeKey];
-
+    
     // This middleware is responsible for manipulating only the context part of the request,
     // leaving all other fields as is.
     SEGMiddlewareBlock contextMiddleware = ^(SEGContext *_Nonnull context, SEGMiddlewareNext _Nonnull next) {
@@ -108,6 +109,7 @@ static NSDictionary *_appendToContextMiddleware;
     }
 
     [SEGAnalytics setupWithConfiguration:configuration];
+    [configuration use:[SEGAdjustIntegrationFactory instance]];
     FlutterMethodChannel* channel = [FlutterMethodChannel
       methodChannelWithName:@"flutter_segment"
       binaryMessenger:[registrar messenger]];
