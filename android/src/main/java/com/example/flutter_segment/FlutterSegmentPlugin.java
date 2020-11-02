@@ -63,7 +63,7 @@ public class FlutterSegmentPlugin implements MethodCallHandler, FlutterPlugin {
       Boolean isAmplitudeIntegrationEnabled = bundle.getBoolean("com.claimsforce.segment.ENABLE_AMPLITUDE_INTEGRATION", false);
       Boolean debug = bundle.getBoolean("com.claimsforce.segment.DEBUG", false);
 
-      Analytics.Builder analyticsBuilder = new Analytics.Builder(applicationContext, writeKey);
+      Analytics.Builder analyticsBuilder = new Analytics.Builder(applicationContext, writeKey).use(AdjustIntegration.FACTORY);
       if (trackApplicationLifecycleEvents) {
         // Enable this to record certain application events automatically
         analyticsBuilder.trackApplicationLifecycleEvents();
