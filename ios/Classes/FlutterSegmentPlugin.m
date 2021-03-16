@@ -1,8 +1,11 @@
 #import "FlutterSegmentPlugin.h"
-#import <Analytics/SEGAnalytics.h>
-#import <Analytics/SEGContext.h>
-#import <Analytics/SEGMiddleware.h>
-#import <Segment_Amplitude/SEGAmplitudeIntegrationFactory.h>
+#import "SEGAnalytics.h"
+#import "SEGContext.h"
+#import "SEGMiddleware.h"
+#import "SEGAmplitudeIntegrationFactory.h"
+#import "SEGAdjustIntegrationFactory.h"
+#import "SEGFirebaseIntegrationFactory.h"
+@import AdSupport;
 
 
 @implementation FlutterSegmentPlugin
@@ -17,7 +20,17 @@ static NSDictionary *_appendToContextMiddleware;
     BOOL trackApplicationLifecycleEvents = [[dict objectForKey: @"com.claimsforce.segment.TRACK_APPLICATION_LIFECYCLE_EVENTS"] boolValue];
     BOOL isAmplitudeIntegrationEnabled = [[dict objectForKey: @"com.claimsforce.segment.ENABLE_AMPLITUDE_INTEGRATION"] boolValue];
     SEGAnalyticsConfiguration *configuration = [SEGAnalyticsConfiguration configurationWithWriteKey:writeKey];
-    
+
+      // Enable advertising collection
+      configuration.enableAdvertisingTracking = YES;
+      // Set the block to be called when the advertisingID is needed
+      // NOTE: In iOS 14, you'll need to manually do authorization elsewhere and only when it has been authorized, return the advertisingIdentifier to segment via the block below
+      configuration.adSupportBlock = ^NSString * _Nonnull{
+          NSUUID *identifier = [[ASIdentifierManager sharedManager] advertisingIdentifier];
+                  return [identifier UUIDString];
+          //return [[ASIdentifierManager sharedManager] advertisingIdentifier];
+      };
+
     // This middleware is responsible for manipulating only the context part of the request,
     // leaving all other fields as is.
     SEGMiddlewareBlock contextMiddleware = ^(SEGContext *_Nonnull context, SEGMiddlewareNext _Nonnull next) {
@@ -68,11 +81,13 @@ static NSDictionary *_appendToContextMiddleware;
                 integrations: ((SEGTrackPayload*)ctx.payload).integrations
               ];
             } else if ([ctx.payload isKindOfClass:[SEGScreenPayload class]]) {
+                SEGScreenPayload *screen = (SEGScreenPayload *)context.payload;
               ctx.payload = [[SEGScreenPayload alloc]
-                initWithName: ((SEGScreenPayload*)ctx.payload).name
-                properties: ((SEGScreenPayload*)ctx.payload).properties
+                initWithName: screen.name
+                category: screen.category
+                properties: screen.properties
                 context: combinedContext
-                integrations: ((SEGScreenPayload*)ctx.payload).integrations
+                integrations: screen.integrations
               ];
             } else if ([ctx.payload isKindOfClass:[SEGGroupPayload class]]) {
               ctx.payload = [[SEGGroupPayload alloc]
@@ -98,7 +113,7 @@ static NSDictionary *_appendToContextMiddleware;
       );
     };
 
-    configuration.middlewares = @[
+    configuration.sourceMiddleware = @[
       [[SEGBlockMiddleware alloc] initWithBlock:contextMiddleware]
     ];
 
@@ -107,9 +122,11 @@ static NSDictionary *_appendToContextMiddleware;
     if (isAmplitudeIntegrationEnabled) {
       [configuration use:[SEGAmplitudeIntegrationFactory instance]];
     }
+    //[configuration use:[SEGAdjustIntegrationFactory instance]];
+    [configuration use:[SEGFirebaseIntegrationFactory instance]];
 
     [SEGAnalytics setupWithConfiguration:configuration];
-    [configuration use:[SEGAdjustIntegrationFactory instance]];
+
     FlutterMethodChannel* channel = [FlutterMethodChannel
       methodChannelWithName:@"flutter_segment"
       binaryMessenger:[registrar messenger]];

@@ -8,12 +8,14 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.google.gms:google-services:4.3.3'
     }
 }
 
 rootProject.allprojects {
     repositories {
+        maven { url 'https://maven.google.com' }
         google()
         jcenter()
     }
@@ -37,5 +39,8 @@ android {
         implementation 'com.segment.analytics.android.integrations:amplitude:+'
         implementation 'com.segment.analytics.android.integrations:adjust:+'
         implementation 'com.android.installreferrer:installreferrer:2.1'
+        implementation 'com.segment.analytics.android.integrations:firebase:+@aar'
     }
 }
+// Add to the bottom of the file
+apply plugin: 'com.google.gms.google-services'
