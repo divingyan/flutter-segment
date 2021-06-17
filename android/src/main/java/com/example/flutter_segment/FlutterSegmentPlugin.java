@@ -14,7 +14,7 @@ import com.segment.analytics.Properties;
 import com.segment.analytics.Traits;
 import com.segment.analytics.Options;
 import com.segment.analytics.Middleware;
-import com.segment.analytics.android.integrations.firebase.FirebaseIntegration;
+//import com.segment.analytics.android.integrations.firebase.FirebaseIntegration;
 import com.segment.analytics.integrations.BasePayload;
 import com.segment.analytics.android.integrations.amplitude.AmplitudeIntegration;
 import com.segment.analytics.android.integrations.adjust.AdjustIntegration;
@@ -65,11 +65,7 @@ public class FlutterSegmentPlugin implements MethodCallHandler, FlutterPlugin {
       Boolean isAmplitudeIntegrationEnabled = bundle.getBoolean("com.claimsforce.segment.ENABLE_AMPLITUDE_INTEGRATION", false);
       Boolean debug = bundle.getBoolean("com.claimsforce.segment.DEBUG", false);
 
-//      Analytics.Builder analyticsBuilder = new Analytics.Builder(applicationContext, writeKey).use(AdjustIntegration.FACTORY);
       Analytics.Builder analyticsBuilder = new Analytics.Builder(applicationContext, writeKey);
-
-      analyticsBuilder.use(FirebaseIntegration.FACTORY);
-//       Analytics.Builder analyticsBuilder = new Analytics.Builder(applicationContext, writeKey);
       if (trackApplicationLifecycleEvents) {
         // Enable this to record certain application events automatically
         analyticsBuilder.trackApplicationLifecycleEvents();
@@ -120,7 +116,7 @@ public class FlutterSegmentPlugin implements MethodCallHandler, FlutterPlugin {
       // This state may happen after the app is popped (back button until the app closes)
       // and opened again from the TaskManager.
       try {
-        Analytics.setSingletonInstance(analyticsBuilder.build());
+//        Analytics.setSingletonInstance(analyticsBuilder.build());
       } catch (IllegalStateException e) {
         Log.w("FlutterSegment", e.getMessage());
       }
