@@ -120,6 +120,8 @@ static NSDictionary *_appendToContextMiddleware;
     configuration.trackApplicationLifecycleEvents = trackApplicationLifecycleEvents;
 
     if (isAmplitudeIntegrationEnabled) {
+      [Amplitude instance].trackingSessionEvents = NO;
+      [Amplitude instance].minTimeBetweenSessionsMillis = 30 * 60 * 1000;// 30 minutes
       [configuration use:[SEGAmplitudeIntegrationFactory instance]];
     }
     //[configuration use:[SEGAdjustIntegrationFactory instance]];
